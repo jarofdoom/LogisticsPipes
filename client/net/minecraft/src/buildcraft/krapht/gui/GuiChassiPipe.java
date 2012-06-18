@@ -98,7 +98,7 @@ public class GuiChassiPipe extends GuiContainer implements IGuiIDHandlerProvider
 				if(!APIProxy.isClient(_player.worldObj)) {
 					_player.openGui(mod_LogisticsPipes.instance, module.getGuiHandlerID() + (100 * (guibutton.id + 1)), _chassiPipe.worldObj, _chassiPipe.xCoord, _chassiPipe.yCoord, _chassiPipe.zCoord);	
 				} else {
-					CoreProxy.sendToServer(new PacketPipeInteger(NetworkConstants.CHASSI_GUI_PACKET_ID,_chassiPipe.xCoord,_chassiPipe.yCoord,_chassiPipe.zCoord,guibutton.id).getPacket());
+					ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(new PacketPipeInteger(NetworkConstants.CHASSI_GUI_PACKET_ID,_chassiPipe.xCoord,_chassiPipe.yCoord,_chassiPipe.zCoord,guibutton.id).getPacket());
 				}
 			}
 		}

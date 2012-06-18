@@ -55,7 +55,7 @@ public class GuiStatistics extends KraphtBaseGuiScreen {
 				if(!APIProxy.isClient(mc.theWorld)) {
 					_player.openGui(mod_LogisticsPipes.instance, prevGuiID, mc.theWorld, pipe.xCoord, pipe.yCoord, pipe.zCoord);
 				} else {
-					CoreProxy.sendToServer(new PacketPipeInteger(NetworkConstants.CHASSI_GUI_PACKET_ID, pipe.xCoord, pipe.yCoord, pipe.zCoord, prevGuiID).getPacket());
+					ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(new PacketPipeInteger(NetworkConstants.CHASSI_GUI_PACKET_ID, pipe.xCoord, pipe.yCoord, pipe.zCoord, prevGuiID).getPacket());
 				}
 			}
 		}

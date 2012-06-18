@@ -7,7 +7,6 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import net.minecraft.src.buildcraft.krapht.gui.GuiChassiPipe;
 import net.minecraft.src.buildcraft.krapht.gui.GuiCraftingPipe;
-import net.minecraft.src.buildcraft.krapht.gui.GuiLiquidSupplierPipe;
 import net.minecraft.src.buildcraft.krapht.gui.GuiOrderer;
 import net.minecraft.src.buildcraft.krapht.gui.GuiProviderPipe;
 import net.minecraft.src.buildcraft.krapht.gui.GuiRoutingStats;
@@ -15,7 +14,6 @@ import net.minecraft.src.buildcraft.krapht.gui.GuiSatellitePipe;
 import net.minecraft.src.buildcraft.krapht.gui.GuiSupplierPipe;
 import net.minecraft.src.buildcraft.krapht.logic.BaseRoutingLogic;
 import net.minecraft.src.buildcraft.krapht.logic.LogicCrafting;
-import net.minecraft.src.buildcraft.krapht.logic.LogicLiquidSupplier;
 import net.minecraft.src.buildcraft.krapht.logic.LogicProvider;
 import net.minecraft.src.buildcraft.krapht.logic.LogicSatellite;
 import net.minecraft.src.buildcraft.krapht.logic.LogicSupplier;
@@ -59,10 +57,6 @@ public class GuiHandler implements IGuiHandler {
 				if(pipe.pipe == null || !(pipe.pipe.logic instanceof LogicCrafting)) return null;
 				return new GuiCraftingPipe(player, ((LogicCrafting)pipe.pipe.logic).getDummyInventory(), (LogicCrafting)pipe.pipe.logic);
 			
-			case GuiIDs.GUI_LiquidSupplier_ID:
-				if(pipe.pipe == null || !(pipe.pipe.logic instanceof LogicLiquidSupplier)) return null;
-				return new GuiLiquidSupplierPipe(player.inventory, ((LogicLiquidSupplier)pipe.pipe.logic).getDummyInventory(), (LogicLiquidSupplier)pipe.pipe.logic);
-				
 			case GuiIDs.GUI_ProviderPipe_ID:
 				if(pipe.pipe == null || !(pipe.pipe.logic instanceof LogicProvider)) return null;
 				return new GuiProviderPipe(player.inventory, ((LogicProvider)pipe.pipe.logic).getDummyInventory(), (LogicProvider)pipe.pipe.logic);

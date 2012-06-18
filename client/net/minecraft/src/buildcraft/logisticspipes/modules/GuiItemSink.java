@@ -47,7 +47,7 @@ public class GuiItemSink extends GuiWithPreviousGuiContainer {
 				_itemSink.setDefaultRoute(!_itemSink.isDefaultRoute());
 				((GuiButton)controlList.get(0)).displayString = _itemSink.isDefaultRoute() ? "Yes" : "No";
 				if(APIProxy.isClient(mc.theWorld)) {
-					CoreProxy.sendToServer(new PacketPipeInteger(NetworkConstants.ITEM_SINK_DEFAULT, pipe.xCoord, pipe.yCoord, pipe.zCoord, (_itemSink.isDefaultRoute() ? 1 : 0) + (slot * 10)).getPacket());
+					ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(new PacketPipeInteger(NetworkConstants.ITEM_SINK_DEFAULT, pipe.xCoord, pipe.yCoord, pipe.zCoord, (_itemSink.isDefaultRoute() ? 1 : 0) + (slot * 10)).getPacket());
 				}
 				break;
 		}

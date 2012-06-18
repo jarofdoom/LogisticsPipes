@@ -139,7 +139,7 @@ public class GuiOrderer extends KraphtBaseGuiScreen {
 			default: 
 				integer = 3;
 			}
-			CoreProxy.sendToServer(new PacketPipeInteger(NetworkConstants.ORDERER_REFRESH_REQUEST,requestPipe.xCoord,requestPipe.yCoord,requestPipe.zCoord,integer).getPacket());
+			ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(new PacketPipeInteger(NetworkConstants.ORDERER_REFRESH_REQUEST,requestPipe.xCoord,requestPipe.yCoord,requestPipe.zCoord,integer).getPacket());
 		}
 	}
 	
@@ -441,7 +441,7 @@ public class GuiOrderer extends KraphtBaseGuiScreen {
 				}
 			} else {
 				CoreRoutedPipe requestPipe = (CoreRoutedPipe)_itemRequester;
-				CoreProxy.sendToServer(new PacketRequestSubmit(requestPipe.xCoord,requestPipe.yCoord,requestPipe.zCoord,selectedItem,requestCount).getPacket());
+				ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(new PacketRequestSubmit(requestPipe.xCoord,requestPipe.yCoord,requestPipe.zCoord,selectedItem,requestCount).getPacket());
 			}
 		} else if (guibutton.id == 1){
 			nextPage();

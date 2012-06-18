@@ -75,6 +75,6 @@ public class OrdererRequests {
 			}
 			_allItems.addLast(item);
 		}
-		CoreProxy.sendToPlayer(player, new PacketRequestGuiContent(_availableItems, _craftableItems, _allItems));
+		player.playerNetServerHandler.sendPacket(new PacketRequestGuiContent(_availableItems, _craftableItems, _allItems).getPacket());
 	}
 }

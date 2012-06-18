@@ -25,7 +25,7 @@ public class LogicCrafting extends BaseLogicCrafting {
 
 		// Using existing BuildCraft packet system
 		final PacketPipeInteger packet = new PacketPipeInteger(NetworkConstants.CRAFTING_PIPE_SATELLITE_ID, xCoord, yCoord, zCoord, satelliteId);
-		CoreProxy.sendToPlayer(player, packet);
+		player.playerNetServerHandler.sendPacket(packet.getPacket());
 	}
 
 	public void setPrevSatellite(EntityPlayerMP player) {
@@ -33,7 +33,7 @@ public class LogicCrafting extends BaseLogicCrafting {
 
 		// Using existing BuildCraft packet system
 		final PacketPipeInteger packet = new PacketPipeInteger(NetworkConstants.CRAFTING_PIPE_SATELLITE_ID, xCoord, yCoord, zCoord, satelliteId);
-		CoreProxy.sendToPlayer(player, packet);
+		player.playerNetServerHandler.sendPacket(packet.getPacket());
 	}
 
 	public void importFromCraftingTable(EntityPlayerMP player) {
@@ -42,7 +42,7 @@ public class LogicCrafting extends BaseLogicCrafting {
 		// Send inventory as packet
 		// Using existing BuildCraft packet system
 		final PacketInventoryChange packet = new PacketInventoryChange(NetworkConstants.CRAFTING_PIPE_IMPORT_BACK, xCoord, yCoord, zCoord, _dummyInventory);
-		CoreProxy.sendToPlayer(player, packet);
+		player.playerNetServerHandler.sendPacket(packet.getPacket());
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class LogicCrafting extends BaseLogicCrafting {
 		// Send the satellite id when opening gui
 		// Using existing BuildCraft packet system
 		final PacketPipeInteger packet = new PacketPipeInteger(NetworkConstants.CRAFTING_PIPE_SATELLITE_ID, xCoord, yCoord, zCoord, satelliteId);
-		CoreProxy.sendToPlayer(player, packet);
+		((EntityPlayerMP)player).playerNetServerHandler.sendPacket(packet.getPacket());
 		player.openGui(mod_LogisticsPipes.instance, GuiIDs.GUI_CRAFTINGPIPE_ID, worldObj, xCoord, yCoord, zCoord);
 	}
 }

@@ -9,7 +9,6 @@ import net.minecraft.src.World;
 import net.minecraft.src.buildcraft.core.CoreProxy;
 import net.minecraft.src.buildcraft.krapht.logic.BaseRoutingLogic;
 import net.minecraft.src.buildcraft.krapht.logic.LogicCrafting;
-import net.minecraft.src.buildcraft.krapht.logic.LogicLiquidSupplier;
 import net.minecraft.src.buildcraft.krapht.logic.LogicProvider;
 import net.minecraft.src.buildcraft.krapht.logic.LogicSatellite;
 import net.minecraft.src.buildcraft.krapht.logic.LogicSupplier;
@@ -59,21 +58,6 @@ public class GuiHandler implements IGuiHandler {
 		        dummy.addDummySlot(9, 90, 64);
 				return dummy;
 			
-			case GuiIDs.GUI_LiquidSupplier_ID:
-				if(pipe.pipe == null || !(pipe.pipe.logic instanceof LogicLiquidSupplier)) return null;
-				dummy = new DummyContainer(player.inventory, ((LogicLiquidSupplier)pipe.pipe.logic).getDummyInventory());
-				dummy.addNormalSlotsForPlayerInventory(18, 97);
-				
-				xOffset = 72;
-				yOffset = 18;
-				
-				for (int row = 0; row < 3; row++){
-					for (int column = 0; column < 3; column++){
-						dummy.addDummySlot(column + row * 3, xOffset + column * 18, yOffset + row * 18);					
-					}
-				}
-				return dummy;
-				
 			case GuiIDs.GUI_ProviderPipe_ID:
 				if(pipe.pipe == null || !(pipe.pipe.logic instanceof LogicProvider)) return null;
 				dummy = new DummyContainer(player.inventory, ((LogicProvider)pipe.pipe.logic).getDummyInventory());

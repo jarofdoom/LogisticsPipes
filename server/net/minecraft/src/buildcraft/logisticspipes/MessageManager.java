@@ -18,11 +18,11 @@ public class MessageManager {
 	public static void overflow(EntityPlayer player, ItemIdentifier item) {
 		LinkedList<ErrorMessage> error = new LinkedList<ErrorMessage>();
 		error.add(new ErrorMessage(item.itemID, item.itemDamage, 1));
-		CoreProxy.sendToPlayer(player, new PacketCraftingLoop(error));
+		((EntityPlayerMP)player).playerNetServerHandler.sendPacket(new PacketCraftingLoop(error).getPacket());
 	}
 
 	public static void errors(EntityPlayer player, LinkedList<ErrorMessage> errors) {
-		CoreProxy.sendToPlayer(player, new PacketMissingItems(errors));
+		((EntityPlayerMP)player).playerNetServerHandler.sendPacket(new PacketMissingItems(errors).getPacket());
 	}
 	
 }

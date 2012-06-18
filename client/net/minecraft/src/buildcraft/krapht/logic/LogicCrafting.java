@@ -9,6 +9,7 @@ package net.minecraft.src.buildcraft.krapht.logic;
 
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.ModLoader;
 import net.minecraft.src.mod_LogisticsPipes;
 import net.minecraft.src.buildcraft.api.APIProxy;
 import net.minecraft.src.buildcraft.core.CoreProxy;
@@ -26,10 +27,10 @@ public class LogicCrafting extends BaseLogicCrafting {
 	public void setNextSatellite() {
 		super.setNextSatellite();
 
-		if (APIProxy.isRemote()) {
+		if (APIProxy.isClient(this.worldObj)) {
 			// Using existing BuildCraft packet system
 			final PacketCoordinates packet = new PacketCoordinates(NetworkConstants.CRAFTING_PIPE_NEXT_SATELLITE, xCoord, yCoord, zCoord);
-			CoreProxy.sendToServer(packet.getPacket());
+			ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(packet.getPacket());
 		}
 	}
 
@@ -37,10 +38,10 @@ public class LogicCrafting extends BaseLogicCrafting {
 	public void setPrevSatellite() {
 		super.setPrevSatellite();
 
-		if (APIProxy.isRemote()) {
+		if (APIProxy.isClient(this.worldObj)) {
 			// Using existing BuildCraft packet system
 			final PacketCoordinates packet = new PacketCoordinates(NetworkConstants.CRAFTING_PIPE_PREV_SATELLITE, xCoord, yCoord, zCoord);
-			CoreProxy.sendToServer(packet.getPacket());
+			ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(packet.getPacket());
 		}
 	}
 
@@ -54,10 +55,10 @@ public class LogicCrafting extends BaseLogicCrafting {
 		super.importFromCraftingTable();
 
 		// Send packet asking for import
-		if (APIProxy.isRemote()) {
+		if (APIProxy.isClient(this.worldObj)) {
 			// Using existing BuildCraft packet system
 			final PacketCoordinates packet = new PacketCoordinates(NetworkConstants.CRAFTING_PIPE_IMPORT, xCoord, yCoord, zCoord);
-			CoreProxy.sendToServer(packet.getPacket());
+			ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(packet.getPacket());
 		}
 	}
 
@@ -86,7 +87,7 @@ public class LogicCrafting extends BaseLogicCrafting {
 	@Override
 	public void onWrenchClicked(EntityPlayer player) {
 		// Open the gui, when not multiplayer
-		if (!APIProxy.isRemote()) {
+		if (!APIProxy.isClient(this.worldObj)) {
 			player.openGui(mod_LogisticsPipes.instance, GuiIDs.GUI_CRAFTINGPIPE_ID, worldObj, xCoord, yCoord, zCoord);
 		}
 	}

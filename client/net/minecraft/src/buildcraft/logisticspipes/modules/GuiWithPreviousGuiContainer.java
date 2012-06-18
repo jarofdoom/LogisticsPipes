@@ -3,6 +3,7 @@ package net.minecraft.src.buildcraft.logisticspipes.modules;
 import net.minecraft.src.Container;
 import net.minecraft.src.GuiContainer;
 import net.minecraft.src.GuiScreen;
+import net.minecraft.src.ModLoader;
 import net.minecraft.src.mod_LogisticsPipes;
 import net.minecraft.src.buildcraft.api.APIProxy;
 import net.minecraft.src.buildcraft.core.CoreProxy;
@@ -35,7 +36,7 @@ public abstract class GuiWithPreviousGuiContainer extends GuiContainer implement
 					mc.thePlayer.openGui(mod_LogisticsPipes.instance, prevGuiID, mc.theWorld, pipe.xCoord, pipe.yCoord, pipe.zCoord);
 				} else {
 					super.keyTyped(c,i);
-					CoreProxy.sendToServer(new PacketPipeInteger(NetworkConstants.GUI_BACK_PACKET, pipe.xCoord, pipe.yCoord, pipe.zCoord, prevGuiID).getPacket());
+					ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(new PacketPipeInteger(NetworkConstants.GUI_BACK_PACKET, pipe.xCoord, pipe.yCoord, pipe.zCoord, prevGuiID).getPacket());
 				}
 			} else {
 				super.keyTyped(c, i);
