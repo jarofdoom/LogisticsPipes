@@ -9,6 +9,11 @@
 package net.minecraft.src.krapht;
 
 import java.util.LinkedList;
+import java.util.List;
+
+import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.InventoryHolder;
 
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
@@ -133,5 +138,37 @@ public class SimpleInventory implements IInventory, ISaveState{
 		ItemStack stackToTake = this._contents[i];
 		this._contents[i] = null;
 		return stackToTake;
+	}
+
+	@Override
+	public ItemStack[] getContents() {
+		return _contents;
+	}
+
+	@Override
+	public InventoryHolder getOwner() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<HumanEntity> getViewers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void onClose(CraftHumanEntity arg0) {
+		
+	}
+
+	@Override
+	public void onOpen(CraftHumanEntity arg0) {
+		
+	}
+
+	@Override
+	public void setMaxStackSize(int arg0) {
+		// Not supported
 	}
 }

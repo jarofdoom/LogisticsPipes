@@ -27,7 +27,7 @@ import net.minecraft.src.krapht.gui.DummyContainer;
 public class GuiHandler implements IGuiHandler {
 	
 	@Override
-	public Object getGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object getGuiElement(int ID, final EntityPlayer player, World world, int x, int y, int z) {
 
 		if(!world.blockExists(x, y, z))
 			return null;
@@ -47,7 +47,7 @@ public class GuiHandler implements IGuiHandler {
 			
 			case GuiIDs.GUI_CRAFTINGPIPE_ID:
 				if(pipe.pipe == null || !(pipe.pipe.logic instanceof LogicCrafting)) return null;
-				dummy = new DummyContainer(player.inventory, ((LogicCrafting)pipe.pipe.logic).getDummyInventory());
+				dummy = new DummyContainer(player, ((LogicCrafting)pipe.pipe.logic).getDummyInventory());
 				dummy.addNormalSlotsForPlayerInventory(18, 97);
 				//Input slots
 		        for(int l = 0; l < 9; l++) {
@@ -60,7 +60,7 @@ public class GuiHandler implements IGuiHandler {
 			
 			case GuiIDs.GUI_ProviderPipe_ID:
 				if(pipe.pipe == null || !(pipe.pipe.logic instanceof LogicProvider)) return null;
-				dummy = new DummyContainer(player.inventory, ((LogicProvider)pipe.pipe.logic).getDummyInventory());
+				dummy = new DummyContainer(player, ((LogicProvider)pipe.pipe.logic).getDummyInventory());
 				dummy.addNormalSlotsForPlayerInventory(18, 97);
 				
 				xOffset = 72;
@@ -80,11 +80,21 @@ public class GuiHandler implements IGuiHandler {
 					public boolean canInteractWith(EntityPlayer entityplayer) {
 						return true;
 					}
+
+					@Override
+					public IInventory getInventory() {
+						return null;
+					}
+
+					@Override
+					public EntityPlayer getPlayer() {
+						return player;
+					}
 				};
 				
 			case GuiIDs.GUI_SupplierPipe_ID:
 				if(pipe.pipe == null || !(pipe.pipe.logic instanceof LogicSupplier)) return null;
-				dummy = new DummyContainer(player.inventory, ((LogicSupplier)pipe.pipe.logic).getDummyInventory());
+				dummy = new DummyContainer(player, ((LogicSupplier)pipe.pipe.logic).getDummyInventory());
 				dummy.addNormalSlotsForPlayerInventory(18, 97);
 				
 				xOffset = 72;
@@ -100,11 +110,11 @@ public class GuiHandler implements IGuiHandler {
 				/*** Modules ***/
 			case GuiIDs.GUI_Module_Extractor_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule() instanceof ModuleExtractor)) return null;
-				return new DummyContainer(player.inventory, null);
+				return new DummyContainer(player, null);
 				
 			case GuiIDs.GUI_Module_ItemSink_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule() instanceof ModuleItemSink)) return null;
-				dummy = new DummyContainer(player.inventory, ((ModuleItemSink)((CoreRoutedPipe)pipe.pipe).getLogisticsModule()).getFilterInventory());
+				dummy = new DummyContainer(player, ((ModuleItemSink)((CoreRoutedPipe)pipe.pipe).getLogisticsModule()).getFilterInventory());
 				dummy.addNormalSlotsForPlayerInventory(8, 60);
 	
 				//Pipe slots
@@ -115,7 +125,7 @@ public class GuiHandler implements IGuiHandler {
 				
 			case GuiIDs.GUI_Module_LiquidSupplier_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule() instanceof ModuleLiquidSupplier)) return null;
-				dummy = new DummyContainer(player.inventory, ((ModuleLiquidSupplier)((CoreRoutedPipe)pipe.pipe).getLogisticsModule()).getFilterInventory());
+				dummy = new DummyContainer(player, ((ModuleLiquidSupplier)((CoreRoutedPipe)pipe.pipe).getLogisticsModule()).getFilterInventory());
 				dummy.addNormalSlotsForPlayerInventory(8, 60);
 	
 				//Pipe slots
@@ -127,7 +137,7 @@ public class GuiHandler implements IGuiHandler {
 				
 			case GuiIDs.GUI_Module_PassiveSupplier_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule() instanceof ModulePassiveSupplier)) return null;
-				dummy = new DummyContainer(player.inventory, ((ModulePassiveSupplier)((CoreRoutedPipe)pipe.pipe).getLogisticsModule()).getFilterInventory());
+				dummy = new DummyContainer(player, ((ModulePassiveSupplier)((CoreRoutedPipe)pipe.pipe).getLogisticsModule()).getFilterInventory());
 				dummy.addNormalSlotsForPlayerInventory(8, 60);
 	
 				//Pipe slots
@@ -139,7 +149,7 @@ public class GuiHandler implements IGuiHandler {
 				
 			case GuiIDs.GUI_Module_Provider_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule() instanceof ModuleProvider)) return null;
-				dummy = new DummyContainer(player.inventory, ((ModuleProvider)((CoreRoutedPipe)pipe.pipe).getLogisticsModule()).getFilterInventory());
+				dummy = new DummyContainer(player, ((ModuleProvider)((CoreRoutedPipe)pipe.pipe).getLogisticsModule()).getFilterInventory());
 				dummy.addNormalSlotsForPlayerInventory(18, 97);
 				
 				xOffset = 72;
@@ -154,7 +164,7 @@ public class GuiHandler implements IGuiHandler {
 				
 			case GuiIDs.GUI_Module_Terminus_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule() instanceof ModuleTerminus)) return null;
-				dummy = new DummyContainer(player.inventory, ((ModuleTerminus)((CoreRoutedPipe)pipe.pipe).getLogisticsModule()).getFilterInventory());
+				dummy = new DummyContainer(player, ((ModuleTerminus)((CoreRoutedPipe)pipe.pipe).getLogisticsModule()).getFilterInventory());
 				dummy.addNormalSlotsForPlayerInventory(8, 60);
 	
 				//Pipe slots
@@ -168,7 +178,7 @@ public class GuiHandler implements IGuiHandler {
 				if(pipe.pipe == null || !(pipe.pipe instanceof PipeLogisticsChassi)) return null;
 				PipeLogisticsChassi _chassiPipe = (PipeLogisticsChassi)pipe.pipe;
 				IInventory _moduleInventory = _chassiPipe.getModuleInventory();
-				dummy = new DummyContainer(player.inventory, _moduleInventory);
+				dummy = new DummyContainer(player, _moduleInventory);
 				if (_chassiPipe.getChassiSize() < 5){
 					dummy.addNormalSlotsForPlayerInventory(18, 97);
 				} else {
@@ -196,6 +206,16 @@ public class GuiHandler implements IGuiHandler {
 					public boolean canInteractWith(EntityPlayer entityplayer) {
 						return true;
 					}
+
+					@Override
+					public IInventory getInventory() {
+						return null;
+					}
+
+					@Override
+					public EntityPlayer getPlayer() {
+						return player;
+					}
 				};
 				
 			case GuiIDs.GUI_Orderer_ID:
@@ -204,6 +224,16 @@ public class GuiHandler implements IGuiHandler {
 					@Override
 					public boolean canInteractWith(EntityPlayer entityplayer) {
 						return true;
+					}
+
+					@Override
+					public IInventory getInventory() {
+						return null;
+					}
+
+					@Override
+					public EntityPlayer getPlayer() {
+						return player;
 					}
 				};
 				
@@ -217,11 +247,11 @@ public class GuiHandler implements IGuiHandler {
 			/*** Modules ***/
 			case GuiIDs.GUI_Module_Extractor_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot) instanceof ModuleExtractor)) return null;
-				return new DummyContainer(player.inventory, null);
+				return new DummyContainer(player, null);
 				
 			case GuiIDs.GUI_Module_ItemSink_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot) instanceof ModuleItemSink)) return null;
-				dummy = new DummyContainer(player.inventory, ((ModuleItemSink)((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot)).getFilterInventory());
+				dummy = new DummyContainer(player, ((ModuleItemSink)((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot)).getFilterInventory());
 				dummy.addNormalSlotsForPlayerInventory(8, 60);
 	
 				//Pipe slots
@@ -232,7 +262,7 @@ public class GuiHandler implements IGuiHandler {
 				
 			case GuiIDs.GUI_Module_LiquidSupplier_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot) instanceof ModuleLiquidSupplier)) return null;
-				dummy = new DummyContainer(player.inventory, ((ModuleLiquidSupplier)((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot)).getFilterInventory());
+				dummy = new DummyContainer(player, ((ModuleLiquidSupplier)((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot)).getFilterInventory());
 				dummy.addNormalSlotsForPlayerInventory(8, 60);
 	
 				//Pipe slots
@@ -244,7 +274,7 @@ public class GuiHandler implements IGuiHandler {
 				
 			case GuiIDs.GUI_Module_PassiveSupplier_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot) instanceof ModulePassiveSupplier)) return null;
-				dummy = new DummyContainer(player.inventory, ((ModulePassiveSupplier)((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot)).getFilterInventory());
+				dummy = new DummyContainer(player, ((ModulePassiveSupplier)((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot)).getFilterInventory());
 				dummy.addNormalSlotsForPlayerInventory(8, 60);
 	
 				//Pipe slots
@@ -256,7 +286,7 @@ public class GuiHandler implements IGuiHandler {
 				
 			case GuiIDs.GUI_Module_Provider_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot) instanceof ModuleProvider)) return null;
-				dummy = new DummyContainer(player.inventory, ((ModuleProvider)((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot)).getFilterInventory());
+				dummy = new DummyContainer(player, ((ModuleProvider)((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot)).getFilterInventory());
 				dummy.addNormalSlotsForPlayerInventory(18, 97);
 				
 				xOffset = 72;
@@ -271,7 +301,7 @@ public class GuiHandler implements IGuiHandler {
 				
 			case GuiIDs.GUI_Module_Terminus_ID:
 				if(pipe.pipe == null || !(pipe.pipe instanceof CoreRoutedPipe) || !(((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot) instanceof ModuleTerminus)) return null;
-				dummy = new DummyContainer(player.inventory, ((ModuleTerminus)((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot)).getFilterInventory());
+				dummy = new DummyContainer(player, ((ModuleTerminus)((CoreRoutedPipe)pipe.pipe).getLogisticsModule().getSubModule(slot)).getFilterInventory());
 				dummy.addNormalSlotsForPlayerInventory(8, 60);
 	
 				//Pipe slots

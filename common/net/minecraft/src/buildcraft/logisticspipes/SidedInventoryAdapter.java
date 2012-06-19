@@ -8,6 +8,12 @@
 
 package net.minecraft.src.buildcraft.logisticspipes;
 
+import java.util.List;
+
+import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.InventoryHolder;
+
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.ItemStack;
@@ -86,5 +92,41 @@ public class SidedInventoryAdapter implements IInventory {
 	@Override
 	public ItemStack getStackInSlotOnClosing(int slot) {
 		return _sidedInventory.getStackInSlotOnClosing(slot + _slotOffset);
+	}
+
+
+	@Override
+	public ItemStack[] getContents() {
+		return _sidedInventory.getContents();
+	}
+
+
+	@Override
+	public InventoryHolder getOwner() {
+		return _sidedInventory.getOwner();
+	}
+
+
+	@Override
+	public List<HumanEntity> getViewers() {
+		return _sidedInventory.getViewers();
+	}
+
+
+	@Override
+	public void onClose(CraftHumanEntity arg0) {
+		_sidedInventory.onClose(arg0);
+	}
+
+
+	@Override
+	public void onOpen(CraftHumanEntity arg0) {
+		_sidedInventory.onOpen(arg0);
+	}
+
+
+	@Override
+	public void setMaxStackSize(int arg0) {
+		_sidedInventory.setMaxStackSize(arg0);
 	}
 }

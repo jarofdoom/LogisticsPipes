@@ -20,10 +20,12 @@ public class DummyContainer extends Container{
 	
 	private final IInventory _playerInventory;
 	private final IInventory _dummyInventory;
+	private final EntityPlayer _player;
 	
-	public DummyContainer(IInventory playerInventory, IInventory dummyInventory){
-		_playerInventory = playerInventory;
+	public DummyContainer(EntityPlayer player, IInventory dummyInventory){
+		_playerInventory = player.inventory;
 		_dummyInventory = dummyInventory;
+		_player = player;
 	}
 
 	@Override
@@ -152,5 +154,15 @@ public class DummyContainer extends Container{
 	protected void retrySlotClick(int i, int j, boolean flag,
 			EntityPlayer entityplayer) {
 		
+	}
+
+	@Override
+	public IInventory getInventory() {
+		return _dummyInventory;
+	}
+
+	@Override
+	public EntityPlayer getPlayer() {
+		return _player;
 	}
 }

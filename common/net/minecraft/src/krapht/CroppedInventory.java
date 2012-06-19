@@ -1,5 +1,11 @@
 package net.minecraft.src.krapht;
 
+import java.util.List;
+
+import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.InventoryHolder;
+
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.ItemStack;
@@ -70,5 +76,35 @@ public class CroppedInventory implements IInventory{
 	@Override
 	public ItemStack getStackInSlotOnClosing(int var1) {
 		return _baseInventory.getStackInSlotOnClosing(var1 + _cropStart);
+	}
+
+	@Override
+	public ItemStack[] getContents() {
+		return _baseInventory.getContents();
+	}
+
+	@Override
+	public InventoryHolder getOwner() {
+		return _baseInventory.getOwner();
+	}
+
+	@Override
+	public List<HumanEntity> getViewers() {
+		return _baseInventory.getViewers();
+	}
+
+	@Override
+	public void onClose(CraftHumanEntity arg0) {
+		_baseInventory.onClose(arg0);
+	}
+
+	@Override
+	public void onOpen(CraftHumanEntity arg0) {
+		_baseInventory.onOpen(arg0);
+	}
+
+	@Override
+	public void setMaxStackSize(int arg0) {
+		_baseInventory.setMaxStackSize(arg0);
 	}
 }
