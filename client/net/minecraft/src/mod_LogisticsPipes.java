@@ -25,9 +25,10 @@ public class mod_LogisticsPipes extends core_LogisticsPipes
     //Log Requests
     public static boolean DisplayRequests;
 
-    @Override
-    public String getVersion()
-    {
-        return super.getLogisticsVersion() + " (built with Minecraft 1.2.5, Buildcraft 2.2.14, Forge 3.1.2.90)";
-    }
+	}
+
+	@Override
+	public String getVersion(){
+		return "0.2.5B";
+	}
 }
