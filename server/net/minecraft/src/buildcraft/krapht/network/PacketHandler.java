@@ -12,11 +12,17 @@ import net.minecraft.src.mod_LogisticsPipes;
 import net.minecraft.src.buildcraft.core.CoreProxy;
 import net.minecraft.src.buildcraft.krapht.CoreRoutedPipe;
 import net.minecraft.src.buildcraft.krapht.logic.LogicCrafting;
+import net.minecraft.src.buildcraft.krapht.logic.LogicProvider;
 import net.minecraft.src.buildcraft.krapht.logic.LogicSatellite;
+import net.minecraft.src.buildcraft.krapht.logic.LogicSupplier;
+import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsProviderLogistics;
 import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsRequestLogistics;
 import net.minecraft.src.buildcraft.krapht.pipes.PipeLogisticsChassi;
 import net.minecraft.src.buildcraft.krapht.routing.OrdererRequests;
+import net.minecraft.src.buildcraft.logisticspipes.modules.ModuleExtractor;
 import net.minecraft.src.buildcraft.logisticspipes.modules.ModuleItemSink;
+import net.minecraft.src.buildcraft.logisticspipes.modules.ModuleProvider;
+import net.minecraft.src.buildcraft.logisticspipes.modules.SneakyOrientation;
 import net.minecraft.src.buildcraft.transport.TileGenericPipe;
 import net.minecraft.src.forge.IPacketHandler;
 
@@ -81,12 +87,42 @@ public class PacketHandler implements IPacketHandler {
 					packetI.readData(data);
 					onItemSinkDefault(net.getPlayerEntity(), packetI);
 					break;
+				case NetworkConstants.PROVIDER_PIPE_NEXT_MODE:
+					final PacketCoordinates packetJ = new PacketCoordinates();
+					packetJ.readData(data);
+					onProviderModeChange(net.getPlayerEntity(), packetJ);
+					break;
+				case NetworkConstants.PROVIDER_PIPE_CHANGE_INCLUDE:
+					final PacketCoordinates packetK = new PacketCoordinates();
+					packetK.readData(data);
+					onProviderIncludeChange(net.getPlayerEntity(), packetK);
+					break;
+				case NetworkConstants.SUPPLIER_PIPE_MODE_CHANGE:
+					final PacketCoordinates packetL = new PacketCoordinates();
+					packetL.readData(data);
+					onSupplierModeChange(net.getPlayerEntity(), packetL);
+					break;
+				case NetworkConstants.EXTRACTOR_MODULE_DIRECTION_SET:
+					final PacketPipeInteger packetM = new PacketPipeInteger();
+					packetM.readData(data);
+					onExtractorModeChange(net.getPlayerEntity(), packetM);
+					break;
+				case NetworkConstants.PROVIDER_MODULE_NEXT_MODE:
+					final PacketPipeInteger packetN = new PacketPipeInteger();
+					packetN.readData(data);
+					onProviderModuleModeChange(net.getPlayerEntity(), packetN);
+					break;
+				case NetworkConstants.PROVIDER_MODULE_CHANGE_INCLUDE:
+					final PacketPipeInteger packetO = new PacketPipeInteger();
+					packetO.readData(data);
+					onProviderModuleIncludeChange(net.getPlayerEntity(), packetO);
+					break;
 			}
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-
+	
 	private void onCraftingPipeNextSatellite(EntityPlayerMP player, PacketCoordinates packet) {
 		final TileGenericPipe pipe = getPipe(player.worldObj, packet.posX, packet.posY, packet.posZ);
 		if (pipe == null) {
@@ -169,6 +205,14 @@ public class PacketHandler implements IPacketHandler {
 		if (cassiPipe.getLogisticsModule().getSubModule(packet.integer) instanceof ModuleItemSink) {
 			player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.ITEM_SINK_STATUS, packet.posX, packet.posY, packet.posZ,
 					(((ModuleItemSink) cassiPipe.getLogisticsModule().getSubModule(packet.integer)).isDefaultRoute() ? 1 : 0)).getPacket());
+		}
+		if (cassiPipe.getLogisticsModule().getSubModule(packet.integer) instanceof ModuleExtractor) {
+			player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.EXTRACTOR_MODULE_RESPONSE, packet.posX, packet.posY, packet.posZ,
+					(((ModuleExtractor) cassiPipe.getLogisticsModule().getSubModule(packet.integer)).getSneakyOrientation().ordinal())).getPacket());
+		}
+		if (cassiPipe.getLogisticsModule().getSubModule(packet.integer) instanceof ModuleProvider) {
+			player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.PROVIDER_MODULE_INCLUDE_CONTENT, packet.posX, packet.posY, packet.posZ, (((ModuleProvider) cassiPipe.getLogisticsModule().getSubModule(packet.integer)).isExcludeFilter() ? 1 : 0)).getPacket());
+			player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.PROVIDER_MODULE_MODE_CONTENT, packet.posX, packet.posY, packet.posZ, (((ModuleProvider) cassiPipe.getLogisticsModule().getSubModule(packet.integer)).getExtractionMode().ordinal())).getPacket());
 		}
 	}
 
@@ -254,8 +298,197 @@ public class PacketHandler implements IPacketHandler {
 			}
 		} else {
 			if (piperouted.getLogisticsModule().getSubModule(slot - 1) instanceof ModuleItemSink) {
-				final ModuleItemSink module = (ModuleItemSink) piperouted.getLogisticsModule();
+				final ModuleItemSink module = (ModuleItemSink) piperouted.getLogisticsModule().getSubModule(slot - 1);
 				module.setDefaultRoute(value == 1);
+				return;
+			}
+		}
+	}
+
+	private void onProviderModeChange(EntityPlayerMP player, PacketCoordinates packet) {
+		final TileGenericPipe pipe = getPipe(player.worldObj, packet.posX, packet.posY, packet.posZ);
+		if (pipe == null) {
+			return;
+		}
+
+		if (!(pipe.pipe instanceof PipeItemsProviderLogistics)) {
+			return;
+		}
+		final PipeItemsProviderLogistics providerpipe = (PipeItemsProviderLogistics) pipe.pipe;
+		final LogicProvider logic = (LogicProvider)providerpipe.logic;
+		logic.nextExtractionMode();
+		player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.PROVIDER_PIPE_MODE_CONTENT, packet.posX, packet.posY, packet.posZ, logic.getExtractionMode().ordinal()).getPacket());
+	}
+
+	private void onProviderIncludeChange(EntityPlayerMP player, PacketCoordinates packet) {
+		final TileGenericPipe pipe = getPipe(player.worldObj, packet.posX, packet.posY, packet.posZ);
+		if (pipe == null) {
+			return;
+		}
+
+		if (!(pipe.pipe instanceof PipeItemsProviderLogistics)) {
+			return;
+		}
+		final PipeItemsProviderLogistics providerpipe = (PipeItemsProviderLogistics) pipe.pipe;
+		final LogicProvider logic = (LogicProvider)providerpipe.logic;
+		logic.setFilterExcluded(!logic.isExcludeFilter());
+		player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.PROVIDER_PIPE_INCLUDE_CONTENT, packet.posX, packet.posY, packet.posZ, logic.isExcludeFilter() ? 1 : 0).getPacket());
+	}
+
+	private void onSupplierModeChange(EntityPlayerMP player, PacketCoordinates packet) {
+		final TileGenericPipe pipe = getPipe(player.worldObj, packet.posX, packet.posY, packet.posZ);
+		if (pipe == null) {
+			return;
+		}
+
+		if (!(pipe.pipe.logic instanceof LogicSupplier)) {
+			return;
+		}
+		final LogicSupplier logic = (LogicSupplier) pipe.pipe.logic;
+		logic.setRequestingPartials(!logic.isRequestingPartials());
+		player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.SUPPLIER_PIPE_MODE_RESPONSE, packet.posX, packet.posY, packet.posZ, logic.isRequestingPartials() ? 1 : 0).getPacket());
+	}
+
+	private void onExtractorModeChange(EntityPlayerMP player, PacketPipeInteger packet) {
+		final TileGenericPipe pipe = getPipe(player.worldObj, packet.posX, packet.posY, packet.posZ);
+		if (pipe == null) {
+			return;
+		}
+
+		if (!(pipe.pipe instanceof CoreRoutedPipe)) {
+			return;
+		}
+
+		final CoreRoutedPipe piperouted = (CoreRoutedPipe) pipe.pipe;
+
+		final int value = packet.integer % 10;
+		final int slot = packet.integer / 10;
+
+		if (piperouted.getLogisticsModule() == null) {
+			return;
+		}
+
+		if (slot <= 0) {
+			if (piperouted.getLogisticsModule() instanceof ModuleExtractor) {
+				final ModuleExtractor module = (ModuleExtractor) piperouted.getLogisticsModule();
+				switch (value){
+				case 0:
+					module.setSneakyOrientation(SneakyOrientation.Top);
+					break;
+				
+				case 1:
+					module.setSneakyOrientation(SneakyOrientation.Side);
+					break;
+				
+				case 2:
+					module.setSneakyOrientation(SneakyOrientation.Bottom);
+					break;
+					
+				case 3:
+					module.setSneakyOrientation(SneakyOrientation.Default);
+					break;
+				}
+				player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.EXTRACTOR_MODULE_RESPONSE, packet.posX, packet.posY, packet.posZ, module.getSneakyOrientation().ordinal()).getPacket());
+				return;
+			}
+		} else {
+			if (piperouted.getLogisticsModule().getSubModule(slot - 1) instanceof ModuleExtractor) {
+				final ModuleExtractor module = (ModuleExtractor) piperouted.getLogisticsModule().getSubModule(slot - 1);
+				switch (value){
+				case 0:
+					module.setSneakyOrientation(SneakyOrientation.Top);
+					break;
+				
+				case 1:
+					module.setSneakyOrientation(SneakyOrientation.Side);
+					break;
+				
+				case 2:
+					module.setSneakyOrientation(SneakyOrientation.Bottom);
+					break;
+					
+				case 3:
+					module.setSneakyOrientation(SneakyOrientation.Default);
+					break;
+				}
+				player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.EXTRACTOR_MODULE_RESPONSE, packet.posX, packet.posY, packet.posZ, module.getSneakyOrientation().ordinal()).getPacket());
+				return;
+			}
+		}
+	}
+
+	private void onProviderModuleModeChange(EntityPlayerMP player, PacketPipeInteger packet) {
+		final TileGenericPipe pipe = getPipe(player.worldObj, packet.posX, packet.posY, packet.posZ);
+		if (pipe == null) {
+			return;
+		}
+
+
+		if (!(pipe.pipe instanceof CoreRoutedPipe)) {
+			return;
+		}
+
+		final CoreRoutedPipe piperouted = (CoreRoutedPipe) pipe.pipe;
+
+		final int slot = packet.integer;
+		
+		if (piperouted.getLogisticsModule() == null) {
+			return;
+		}
+		
+		if (slot <= 0) {
+			if (piperouted.getLogisticsModule() instanceof ModuleProvider) {
+				final ModuleProvider module = (ModuleProvider)piperouted.getLogisticsModule();
+				module.nextExtractionMode();
+				player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.PROVIDER_MODULE_MODE_CONTENT, packet.posX, packet.posY, packet.posZ, module.getExtractionMode().ordinal()).getPacket());
+				System.out.println("Recived ModuleModeChange: "+module.getExtractionMode().ordinal());
+				return;
+			}
+		} else {
+			if (piperouted.getLogisticsModule().getSubModule(slot - 1) instanceof ModuleProvider) {
+				final ModuleProvider module = (ModuleProvider)piperouted.getLogisticsModule().getSubModule(slot - 1);
+				module.nextExtractionMode();
+				player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.PROVIDER_MODULE_MODE_CONTENT, packet.posX, packet.posY, packet.posZ, module.getExtractionMode().ordinal()).getPacket());
+				System.out.println("Recived ModuleModeChange: "+module.getExtractionMode().ordinal());
+				return;
+			}
+		}
+	}
+
+	private void onProviderModuleIncludeChange(EntityPlayerMP player, PacketPipeInteger packet) {
+		final TileGenericPipe pipe = getPipe(player.worldObj, packet.posX, packet.posY, packet.posZ);
+		if (pipe == null) {
+			return;
+		}
+
+
+		if (!(pipe.pipe instanceof CoreRoutedPipe)) {
+			return;
+		}
+
+		final CoreRoutedPipe piperouted = (CoreRoutedPipe) pipe.pipe;
+
+		final int slot = packet.integer;
+
+		if (piperouted.getLogisticsModule() == null) {
+			return;
+		}
+		
+		
+		if (slot <= 0) {
+			if (piperouted.getLogisticsModule() instanceof ModuleProvider) {
+				final ModuleProvider module = (ModuleProvider)piperouted.getLogisticsModule();
+				module.setFilterExcluded(!module.isExcludeFilter());
+				player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.PROVIDER_MODULE_INCLUDE_CONTENT, packet.posX, packet.posY, packet.posZ, module.isExcludeFilter() ? 1 : 0).getPacket());
+				System.out.println("Recived ModuleIncludeChange: "+(module.isExcludeFilter() ? 1 : 0));
+				return;
+			}
+		} else {
+			if (piperouted.getLogisticsModule().getSubModule(slot - 1) instanceof ModuleProvider) {
+				final ModuleProvider module = (ModuleProvider)piperouted.getLogisticsModule().getSubModule(slot - 1);
+				module.setFilterExcluded(!module.isExcludeFilter());
+				player.playerNetServerHandler.sendPacket(new PacketPipeInteger(NetworkConstants.PROVIDER_MODULE_INCLUDE_CONTENT, packet.posX, packet.posY, packet.posZ, (module.isExcludeFilter() ? 1 : 0)).getPacket());
+				System.out.println("Recived ModuleIncludeChange: "+(module.isExcludeFilter() ? 1 : 0));
 				return;
 			}
 		}

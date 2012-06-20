@@ -25,8 +25,6 @@ public class mod_LogisticsPipes extends core_LogisticsPipes
     //Log Requests
     public static boolean DisplayRequests;
 
-	}
-
 	@Override
 	public String getVersion(){
 		return "0.2.5B";
