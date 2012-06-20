@@ -13,7 +13,13 @@ import net.minecraft.src.ModLoader;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.mod_LogisticsPipes;
 import net.minecraft.src.buildcraft.api.APIProxy;
+import net.minecraft.src.buildcraft.core.CoreProxy;
 import net.minecraft.src.buildcraft.krapht.GuiIDs;
+import net.minecraft.src.buildcraft.krapht.ServerProxy;
+import net.minecraft.src.buildcraft.krapht.network.NetworkConstants;
+import net.minecraft.src.buildcraft.krapht.network.PacketPipeInteger;
+import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsProviderLogistics;
+import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsSupplierLogistics;
 import net.minecraft.src.buildcraft.logisticspipes.ExtractionMode;
 import net.minecraft.src.krapht.InventoryUtil;
 import net.minecraft.src.krapht.InventoryUtilFactory;
@@ -47,6 +53,7 @@ public class LogicProvider extends BaseRoutingLogic{
 		if(!APIProxy.isClient(entityplayer.worldObj)) {
 			//GuiProxy.openGuiProviderPipe(entityplayer.inventory, dummyInventory, this);
 			entityplayer.openGui(mod_LogisticsPipes.instance, GuiIDs.GUI_ProviderPipe_ID, worldObj, xCoord, yCoord, zCoord);
+			ServerProxy.sendToPlayer_GUI_INFORMATION(entityplayer, xCoord, yCoord, zCoord, this);
 		}	
 	}
 	

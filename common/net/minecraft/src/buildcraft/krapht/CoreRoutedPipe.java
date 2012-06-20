@@ -31,8 +31,12 @@ import net.minecraft.src.buildcraft.api.Position;
 import net.minecraft.src.buildcraft.core.CoreProxy;
 import net.minecraft.src.buildcraft.core.Utils;
 import net.minecraft.src.buildcraft.krapht.logic.BaseRoutingLogic;
+import net.minecraft.src.buildcraft.krapht.logic.LogicProvider;
+import net.minecraft.src.buildcraft.krapht.logic.LogicSupplier;
 import net.minecraft.src.buildcraft.krapht.network.NetworkConstants;
 import net.minecraft.src.buildcraft.krapht.network.PacketPipeInteger;
+import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsProviderLogistics;
+import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsSupplierLogistics;
 import net.minecraft.src.buildcraft.krapht.routing.IRouter;
 import net.minecraft.src.buildcraft.krapht.routing.RoutedEntityItem;
 import net.minecraft.src.buildcraft.logisticspipes.IAdjacentWorldAccess;
@@ -42,6 +46,7 @@ import net.minecraft.src.buildcraft.logisticspipes.PipeTransportLayer;
 import net.minecraft.src.buildcraft.logisticspipes.RouteLayer;
 import net.minecraft.src.buildcraft.logisticspipes.TransportLayer;
 import net.minecraft.src.buildcraft.logisticspipes.modules.ILogisticsModule;
+import net.minecraft.src.buildcraft.logisticspipes.modules.ModuleExtractor;
 import net.minecraft.src.buildcraft.logisticspipes.modules.ModuleItemSink;
 import net.minecraft.src.buildcraft.transport.IPipeTransportItemsHook;
 import net.minecraft.src.buildcraft.transport.Pipe;
@@ -253,7 +258,6 @@ public abstract class CoreRoutedPipe extends Pipe implements IRequestItems, IAdj
 	
 	@Override
 	public void onBlockPlaced() {
-		// TODO Auto-generated method stub
 		super.onBlockPlaced();
 	}
 	
@@ -269,9 +273,12 @@ public abstract class CoreRoutedPipe extends Pipe implements IRequestItems, IAdj
 					if(APIProxy.isServerSide() && getLogisticsModule() instanceof ModuleItemSink) {
 						ServerProxy.sendToPlayer_ITEM_SINK_STATUS(entityplayer, xCoord, yCoord, zCoord, ((ModuleItemSink)getLogisticsModule()).isDefaultRoute());
 					}
+					if(APIProxy.isServerSide() && getLogisticsModule() instanceof ModuleExtractor) {
+						ServerProxy.sendToPlayer_EXTRACTOR_MODULE_RESPONSE(entityplayer, xCoord, yCoord, zCoord, ((ModuleExtractor)getLogisticsModule()).getSneakyOrientation().ordinal());
+					}
 					return true;
 				} else {
-					//TODO need 'return true;' here ???
+					return false;
 				}
 			}
 		}
