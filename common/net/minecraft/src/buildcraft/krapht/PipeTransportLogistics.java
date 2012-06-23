@@ -129,7 +129,7 @@ public class PipeTransportLogistics extends PipeTransportItems {
 		Orientations value =_pipe.getRouteLayer().getOrientationForItem(routedItem); 
 		if(newItem && APIProxy.isServerSide()) {
 			//if (item.synchroTracker.markTimeIfDelay(worldObj, 6 * BuildCraftCore.updateFactor))
-				CoreProxy.sendToPlayers(createItemPacket(routedItem.getEntityPassiveItem(), value), worldObj, xCoord, yCoord, zCoord, DefaultProps.NETWORK_UPDATE_RANGE, mod_BuildCraftTransport.instance);
+				CoreProxy.sendToPlayers(createItemPacket(routedItem.getEntityPassiveItem(), value), xCoord, yCoord, zCoord, 128, mod_BuildCraftTransport.instance);
 		}
 		if (value == null) {
 			System.out.println("THIS IS NOT SUPPOSED TO HAPPEN!");
@@ -296,7 +296,7 @@ public class PipeTransportLogistics extends PipeTransportItems {
 				travelingEntities.put(new Integer(item.entityId), new EntityData(item, packet.getOrientation()));
 				item.container = container;
 			} else {
-				travelingEntities.get(new Integer(item.entityId)).orientation = packet.getOrientation();
+				((EntityData)travelingEntities.get(new Integer(item.entityId))).orientation = packet.getOrientation();
 			}
 			return;
 		}
@@ -312,7 +312,7 @@ public class PipeTransportLogistics extends PipeTransportItems {
 			travelingEntities.put(new Integer(item.entityId), new EntityData(item, packet.getOrientation()));
 			item.container = container;
 		} else {
-			travelingEntities.get(new Integer(item.entityId)).orientation = packet.getOrientation();
+			((EntityData)travelingEntities.get(new Integer(item.entityId))).orientation = packet.getOrientation();
 		}
 	}
 
