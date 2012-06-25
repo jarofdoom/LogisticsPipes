@@ -21,7 +21,7 @@ public class mod_LogisticsPipes extends core_LogisticsPipes
         instance = this;
     }
     public static mod_LogisticsPipes instance;
-
+	
     //Log Requests
     public static boolean DisplayRequests;
 
