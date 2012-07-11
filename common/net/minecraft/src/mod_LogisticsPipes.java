@@ -12,8 +12,9 @@ import net.minecraft.src.buildcraft.krapht.BuildCraftProxy2;
 import net.minecraft.src.buildcraft.krapht.IBuildCraftProxy;
 import net.minecraft.src.buildcraft.krapht.SimpleServiceLocator;
 import net.minecraft.src.buildcraft.logisticspipes.ItemModule;
+import net.minecraft.src.buildcraft.logisticspipes.ModTextureProxy;
 
-public class mod_LogisticsPipes extends core_LogisticsPipes
+public class mod_LogisticsPipes extends ModTextureProxy
 {
     public mod_LogisticsPipes()
     {
@@ -27,6 +28,6 @@ public class mod_LogisticsPipes extends core_LogisticsPipes
 
 	@Override
 	public String getVersion(){
-		return "0.3.1";
+		return "0.4.3";
 	}
 }

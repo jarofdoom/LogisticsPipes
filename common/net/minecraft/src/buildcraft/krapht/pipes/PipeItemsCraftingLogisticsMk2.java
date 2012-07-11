@@ -41,23 +41,57 @@ import net.minecraft.src.krapht.ItemIdentifier;
 import net.minecraft.src.krapht.ItemIdentifierStack;
 import net.minecraft.src.krapht.WorldUtil;
 
-public class PipeItemsCraftingLogisticsMK2 extends PipeItemsCraftingLogistics{
+public class PipeItemsCraftingLogisticsMk2 extends PipeItemsCraftingLogistics{
 	
-	public PipeItemsCraftingLogisticsMK2(int itemID) {
+	public PipeItemsCraftingLogisticsMk2(int itemID) {
 		super(itemID);
+	}
+	
+	private boolean combinable(ItemStack stack1, ItemStack stack2) {
+		if(stack1 == null || stack2 == null) {
+			return false;
+		}
+		return stack1.itemID == stack2.itemID && stack1.getItemDamage() == stack2.getItemDamage() && (stack1.stackSize + stack2.stackSize) < stack1.getMaxStackSize();
+	}
+	
+	@Override
+	protected ItemStack extractFromAutoWorkbench(TileAutoWorkbench workbench){
+		ItemStack stack = workbench.extractItem(true, Orientations.Unknown);
+		if(stack != null) {
+			for(int i = 1;i < 64;i++) {
+				if(combinable(workbench.extractItem(false, Orientations.Unknown),stack)) {
+					ItemStack stack2 = workbench.extractItem(true, Orientations.Unknown);
+					stack.stackSize += stack2.stackSize;
+				}
+			}
+		}
+		return stack;
 	}
 	
 	@Override
 	protected ItemStack extractFromIInventory(IInventory inv){
+		ItemStack items = null;
+		for(int i=0; i < 64;i++) {
+			InventoryUtil invUtil = new InventoryUtil(inv, false);
+			LogicCrafting craftingLogic = (LogicCrafting) this.logic;
+			ItemStack itemstack = craftingLogic.getCraftedItem();
+			if (itemstack == null) return null;
 		
-		InventoryUtil invUtil = new InventoryUtil(inv, false);
-		LogicCrafting craftingLogic = (LogicCrafting) this.logic;
-		ItemStack itemstack = craftingLogic.getCraftedItem();
-		if (itemstack == null) return null;
-		
-		ItemIdentifierStack targetItemStack = ItemIdentifierStack.GetFromStack(itemstack);
-		return invUtil.getMultipleItems(targetItemStack.getItem(), targetItemStack.stackSize);
-		//return invUtil.getSingleItem(targetItemStack.getItem());
+			ItemIdentifierStack targetItemStack = ItemIdentifierStack.GetFromStack(itemstack);
+			if(items == null) {
+				items = invUtil.getSingleItem(targetItemStack.getItem());
+				if(items == null) {
+					break;
+				}
+			} else {
+				if(invUtil.getSingleItem(targetItemStack.getItem())!= null) {
+					items.stackSize++;
+				} else {
+					break;
+				}
+			}
+		}
+		return items;
 	}
 
 	@Override

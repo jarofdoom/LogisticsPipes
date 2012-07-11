@@ -56,6 +56,7 @@ public class GuiCraftingPipe extends GuiContainer implements IGuiIDHandlerProvid
 		controlList.add(new SmallGuiButton(1, (width-xSize) / 2 + 129, (height - ySize) / 2 + 50, 10,10, "<"));
 		controlList.add(new SmallGuiButton(2, (width-xSize) / 2 + 138, (height - ySize) / 2 + 75, 30,10, "Paint"));
 		controlList.add(new SmallGuiButton(3, (width-xSize) / 2 + 47, (height - ySize) / 2 + 50, 37,10, "Import"));
+		controlList.add(new SmallGuiButton(4, (width-xSize) / 2 + 15, (height - ySize) / 2 + 50, 28,10, "Open"));
 	}
 	
 	
@@ -74,6 +75,9 @@ public class GuiCraftingPipe extends GuiContainer implements IGuiIDHandlerProvid
 		case 3:
 			_logic.importFromCraftingTable();
 			return;
+		case 4:
+			_logic.openAttachedGui(_player);
+			return;
 		default:
 			super.actionPerformed(guibutton);
 			return;
@@ -88,11 +92,6 @@ public class GuiCraftingPipe extends GuiContainer implements IGuiIDHandlerProvid
 
 	@Override
 	protected void drawGuiContainerForegroundLayer() {
-//		int i = mc.renderEngine.getTexture("/net/minecraft/src/buildcraft/krapht/gui/crafting.png");
-//		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-//		mc.renderEngine.bindTexture(i);
-//		drawTexturedModalRect(0, 0, 0, 0, xSize, ySize);
-
 		fontRenderer.drawString("Inputs", 18, 7, 0x404040);
 		fontRenderer.drawString("Output", 48, 67, 0x404040);
 		fontRenderer.drawString("Inventory", 18, 86, 0x404040);
@@ -113,30 +112,23 @@ public class GuiCraftingPipe extends GuiContainer implements IGuiIDHandlerProvid
 		drawTexturedModalRect(155, 50, 10 * (xSize / 16) , 0, 10, 10);
 		MinecraftForgeClient.unbindTexture();
 		fontRenderer.drawString(""+_logic.satelliteId , 155 - fontRenderer.getStringWidth(""+_logic.satelliteId) , 52, 0x404040);
-
-		
 	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
-		int i = mc.renderEngine.getTexture("/net/minecraft/src/buildcraft/krapht/gui/crafting.png");
+		int i = mc.renderEngine.getTexture("/logisticspipes/gui/crafting.png");
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		mc.renderEngine.bindTexture(i);
 		int j = (width - xSize) / 2;
 		int k = (height - ySize) / 2;
-//		//
-//		//mc.renderEngine.bindTexture(mod_LogisticsPipes.)
-//		//mc.renderEngine.bindTexture(BuildCraftCore.redLaserTexture);
+
 		drawTexturedModalRect(j, k, 0, 0, xSize, ySize);
-		
-		
+
 		drawRect(400, 400, 0, 0, 0x404040);
-		
 	}
 
 	@Override
 	public int getGuiID() {
 		return GuiIDs.GUI_CRAFTINGPIPE_ID;
 	}
-
 }

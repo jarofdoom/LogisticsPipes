@@ -85,6 +85,15 @@ public class LogicCrafting extends BaseLogicCrafting {
 	}
 
 	@Override
+	public void openAttachedGui(EntityPlayer player) {
+		if (APIProxy.isClient(worldObj)) {
+			final PacketCoordinates packet = new PacketCoordinates(NetworkConstants.CRAFTING_PIPE_OPEN_CONNECTED_GUI, xCoord, yCoord, zCoord);
+			ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(packet.getPacket());
+		}
+		super.openAttachedGui(player);
+	}
+	
+	@Override
 	public void onWrenchClicked(EntityPlayer player) {
 		// Open the gui, when not multiplayer
 		if (!APIProxy.isClient(this.worldObj)) {

@@ -253,6 +253,15 @@ package net.minecraft.src;
 import java.io.File;
 import java.lang.reflect.Method;
 
+import net.minecraft.src.Block;
+import net.minecraft.src.BuildCraftCore;
+import net.minecraft.src.BuildCraftTransport;
+import net.minecraft.src.CraftingManager;
+import net.minecraft.src.Item;
+import net.minecraft.src.ItemBlock;
+import net.minecraft.src.ItemStack;
+import net.minecraft.src.ModLoader;
+import net.minecraft.src.mod_BuildCraftTransport;
 import net.minecraft.src.buildcraft.core.CoreProxy;
 import net.minecraft.src.buildcraft.krapht.GuiHandler;
 import net.minecraft.src.buildcraft.krapht.IBuildCraftProxy;
@@ -262,26 +271,17 @@ import net.minecraft.src.buildcraft.krapht.LogisticsManager;
 import net.minecraft.src.buildcraft.krapht.SimpleServiceLocator;
 import net.minecraft.src.buildcraft.krapht.logistics.LogisticsManagerV2;
 import net.minecraft.src.buildcraft.krapht.network.ConnectionHandler;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsBasicLogistics;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsCraftingLogistics;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsCraftingLogisticsMK2;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsProviderLogistics;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsRequestLogistics;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsRequestLogisticsMK2;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsSatelliteLogistics;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeItemsSupplierLogistics;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeLogisticsChassiMk1;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeLogisticsChassiMk2;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeLogisticsChassiMk3;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeLogisticsChassiMk4;
-import net.minecraft.src.buildcraft.krapht.pipes.PipeLogisticsChassiMk5;
+import net.minecraft.src.buildcraft.krapht.pipes.*;
 import net.minecraft.src.buildcraft.krapht.routing.RouterManager;
 import net.minecraft.src.buildcraft.logisticspipes.ItemModule;
+import net.minecraft.src.buildcraft.logisticspipes.blocks.LogisticsBlock;
+import net.minecraft.src.buildcraft.logisticspipes.blocks.LogisticsBlockRenderer;
+import net.minecraft.src.buildcraft.logisticspipes.blocks.LogisticsTileEntiy;
+import net.minecraft.src.buildcraft.logisticspipes.items.CraftingSignCreator;
 import net.minecraft.src.buildcraft.transport.BlockGenericPipe;
 import net.minecraft.src.buildcraft.transport.Pipe;
 import net.minecraft.src.forge.Configuration;
 import net.minecraft.src.forge.MinecraftForge;
-import net.minecraft.src.forge.MinecraftForgeClient;
 import net.minecraft.src.forge.NetworkMod;
 import net.minecraft.src.forge.Property;
 import net.minecraft.src.krapht.InventoryUtilFactory;
@@ -308,6 +308,7 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 	
 	public static Item LogisticsNetworkMonitior;
 	public static Item LogisticsRemoteOrderer;
+	public static Item LogisticsCraftingSignCreator;
 	
 	public static Item ModuleItem;
 	
@@ -332,7 +333,9 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 	public static int LOGISTICSPIPE_CHASSI5_ID						= 6885;
 																	// 6886 - 3.x LiquidSupplier;
 	public static int LOGISTICSPIPE_CRAFTING_MK2_ID					= 6887;
-	public static int LOGISTICSPIPE_REQUEST_MK2_ID					= 6887;
+	public static int LOGISTICSPIPE_REQUEST_MK2_ID					= 6888;
+	
+	public static int LOGISTICSCRAFTINGSIGNCREATOR_ID				= 6900;
 	
 	
 	
@@ -340,6 +343,7 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 	
 	public static final int LOGISTICSNETWORKMONITOR_ICONINDEX = 0 * 16 + 0;
 	public static final int LOGISTICSREMOTEORDERER_ICONINDEX = 0 * 16 + 1;
+	public static final int LOGISTICSCRAFTINGSIGNCREATOR_ICONINDEX = 0 * 16 + 2;
 	
 	public static int LOGISTICSPIPE_TEXTURE							= 0;
 	public static int LOGISTICSPIPE_PROVIDER_TEXTURE				= 0;
@@ -361,31 +365,39 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 	public static int LOGISTICSPIPE_REQUESTERMK2_TEXTURE			= 0;
 	
 		
-	//Texture files
+	// ** Texture files **
 	
-	public static final String LOGISTICSITEMS_TEXTURE_FILE = "/net/minecraft/src/buildcraft/krapht/gui/item_textures.png";
-	public static final String LOGISTICSACTIONTRIGGERS_TEXTURE_FILE = "/net/minecraft/src/buildcraft/krapht/gui/actiontriggers_textures.png";
+	// Misc
+	public static final String LOGISTICSITEMS_TEXTURE_FILE = "/logisticspipes/item_textures.png";
+	public static final String LOGISTICSACTIONTRIGGERS_TEXTURE_FILE = "/logisticspipes/actiontriggers_textures.png";
 	
-	public static final String LOGISTICSPIPE_TEXTURE_FILE					= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipe.png";
-	public static final String LOGISTICSPIPE_PROVIDER_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipeprovider.png";
-	public static final String LOGISTICSPIPE_REQUESTER_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspiperequester.png";
-	public static final String LOGISTICSPIPE_CRAFTER_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipecrafter.png";
-	public static final String LOGISTICSPIPE_SATELLITE_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipesatellite.png";
-	public static final String LOGISTICSPIPE_SUPPLIER_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipesupplier.png";
-	public static final String LOGISTICSPIPE_ROUTED_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspiperouted.png";
-	public static final String LOGISTICSPIPE_NOTROUTED_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipenotrouted.png";
-	public static final String LOGISTICSPIPE_CHASSI_ROUTED_TEXTURE_FILE		= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipechassirouted.png";
-	public static final String LOGISTICSPIPE_CHASSI_NOTROUTED_TEXTURE_FILE	= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipechassinotrouted.png";
-	public static final String LOGISTICSPIPE_CHASSI_DIRECTION_TEXTURE_FILE	= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipechassidirection.png";
-	public static final String LOGISTICSPIPE_CHASSI1_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipechassi1.png";
-	public static final String LOGISTICSPIPE_CHASSI2_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipechassi2.png";
-	public static final String LOGISTICSPIPE_CHASSI3_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipechassi3.png";
-	public static final String LOGISTICSPIPE_CHASSI4_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipechassi4.png";
-	public static final String LOGISTICSPIPE_CHASSI5_TEXTURE_FILE			= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipechassi5.png";
-	public static final String LOGISTICSPIPE_CRAFTERMK2_TEXTURE_FILE		= "/net/minecraft/src/buildcraft/krapht/gui/logisticspipecrafterMK2.png";
-	public static final String LOGISTICSPIPE_REQUESTERMK2_TEXTURE_FILE		= "/net/minecraft/src/buildcraft/krapht/gui/logisticspiperequesterMK2.png";
+	// Standalone pipes
+	public static final String LOGISTICSPIPE_TEXTURE_FILE					= "/logisticspipes/pipes/basic.png";
+	public static final String LOGISTICSPIPE_PROVIDER_TEXTURE_FILE			= "/logisticspipes/pipes/provider.png";
+	public static final String LOGISTICSPIPE_REQUESTER_TEXTURE_FILE			= "/logisticspipes/pipes/request.png";
+	public static final String LOGISTICSPIPE_REQUESTERMK2_TEXTURE_FILE		= "/logisticspipes/pipes/request_mk2.png";
+	public static final String LOGISTICSPIPE_CRAFTER_TEXTURE_FILE			= "/logisticspipes/pipes/crafting.png";
+	public static final String LOGISTICSPIPE_CRAFTERMK2_TEXTURE_FILE		= "/logisticspipes/pipes/crafting_mk2.png";
+	public static final String LOGISTICSPIPE_SATELLITE_TEXTURE_FILE			= "/logisticspipes/pipes/satellite.png";
+	public static final String LOGISTICSPIPE_SUPPLIER_TEXTURE_FILE			= "/logisticspipes/pipes/supplier.png";
 	
-	//Configrables
+	// Status overlay
+	public static final String LOGISTICSPIPE_ROUTED_TEXTURE_FILE			= "/logisticspipes/pipes/status_overlay/routed.png";
+	public static final String LOGISTICSPIPE_NOTROUTED_TEXTURE_FILE			= "/logisticspipes/pipes/status_overlay/not_routed.png";
+	
+	// Chassi pipes
+	public static final String LOGISTICSPIPE_CHASSI1_TEXTURE_FILE			= "/logisticspipes/pipes/chassi/chassi_mk1.png";
+	public static final String LOGISTICSPIPE_CHASSI2_TEXTURE_FILE			= "/logisticspipes/pipes/chassi/chassi_mk2.png";
+	public static final String LOGISTICSPIPE_CHASSI3_TEXTURE_FILE			= "/logisticspipes/pipes/chassi/chassi_mk3.png";
+	public static final String LOGISTICSPIPE_CHASSI4_TEXTURE_FILE			= "/logisticspipes/pipes/chassi/chassi_mk4.png";
+	public static final String LOGISTICSPIPE_CHASSI5_TEXTURE_FILE			= "/logisticspipes/pipes/chassi/chassi_mk5.png";
+	
+	// Chassi status overlay
+	public static final String LOGISTICSPIPE_CHASSI_ROUTED_TEXTURE_FILE		= "/logisticspipes/pipes/chassi/status_overlay/routed.png";
+	public static final String LOGISTICSPIPE_CHASSI_NOTROUTED_TEXTURE_FILE	= "/logisticspipes/pipes/chassi/status_overlay/not_routed.png";
+	public static final String LOGISTICSPIPE_CHASSI_DIRECTION_TEXTURE_FILE	= "/logisticspipes/pipes/chassi/status_overlay/direction.png";
+	
+	// Configrables
 	public static int LOGISTICS_DETECTION_LENGTH	= 50;
 	public static int LOGISTICS_DETECTION_COUNT		= 100;
 	public static int LOGISTICS_DETECTION_FREQUENCY = 20;
@@ -396,6 +408,13 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 	public static final float LOGISTICS_DEFAULTROUTED_SPEED_MULTIPLIER = 10F;
 	
 	protected static Configuration configuration;
+	
+	//Blocks
+	Block logisticsBlock;
+	
+	//BlockID
+	
+	public static int LOGISTICS_BLOCK_ID = 201;
 	
 	/** stuff for testing **/
 	
@@ -429,7 +448,16 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 			ModLoader.getLogger().fine("Additional pipes detected, adding compatibility");
 
 		} catch (Exception e) {
-			ModLoader.getLogger().fine("Additional pipes not detected: " + e.getMessage());
+			try {
+				//PipeItemTeleport = (Class<? extends Pipe>) Class.forName("buildcraft.additionalpipes.pipes.PipeItemTeleport");
+				PipeItemTeleport = (Class<? extends Pipe>) Class.forName("net.minecraft.src.buildcraft.additionalpipes.pipes.PipeItemTeleport");
+				teleportPipeMethod = PipeItemTeleport.getMethod("getConnectedPipes", boolean.class);
+				teleportPipeDetected = true;
+				ModLoader.getLogger().fine("Additional pipes detected, adding compatibility");
+
+			} catch (Exception e1) {
+				ModLoader.getLogger().fine("Additional pipes not detected: " + e1.getMessage());
+			}
 		}
 		BuildCraftCore.initialize();
 		BuildCraftTransport.initialize();
@@ -482,9 +510,12 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 		
 		Property logisticPipeRequesterMK2IdProperty = configuration.getOrCreateIntProperty("logisticsPipeRequesterMK2.id", Configuration.CATEGORY_ITEM, LOGISTICSPIPE_REQUEST_MK2_ID);
 		logisticPipeRequesterMK2IdProperty.comment = "The item id for the requesting logistics pipe MK2";
-		
+
 		Property logisticModuleIdProperty = configuration.getOrCreateIntProperty("logisticsModules.id", Configuration.CATEGORY_ITEM, ItemModuleId);
 		logisticModuleIdProperty.comment = "The item id for the modules";
+
+		Property logisticCraftingSignCreatorIdProperty = configuration.getOrCreateIntProperty("logisticsCraftingSignCreator.id", Configuration.CATEGORY_ITEM, LOGISTICSCRAFTINGSIGNCREATOR_ID);
+		logisticCraftingSignCreatorIdProperty.comment = "The item id for the crafting sign creator";
 
 		
 		
@@ -501,9 +532,15 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 		
 		Property countInvertWheelProperty = configuration.getOrCreateBooleanProperty("ordererCountInvertWheel", Configuration.CATEGORY_GENERAL, LOGISTICS_ORDERER_COUNT_INVERTWHEEL);
 		countInvertWheelProperty.comment = "Inverts the the mouse wheel scrolling for remote order number of items"; 
-		
+
 		Property pageInvertWheelProperty = configuration.getOrCreateBooleanProperty("ordererPageInvertWheel", Configuration.CATEGORY_GENERAL, LOGISTICS_ORDERER_PAGE_INVERTWHEEL);
 		pageInvertWheelProperty.comment = "Inverts the the mouse wheel scrolling for remote order pages";
+
+		
+		
+		
+		Property logisticsBlockId = configuration.getOrCreateIntProperty("logisticsBlockId", Configuration.CATEGORY_BLOCK, LOGISTICS_BLOCK_ID);
+		logisticsBlockId.comment = "The ID of the LogisticsPipes Block (0 if you don't want any block)";
 				
 		configuration.save();
 		
@@ -529,15 +566,21 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 		LOGISTICS_DETECTION_FREQUENCY 	= Math.max(Integer.parseInt(detectionFrequency.value), 1);
 		LOGISTICS_ORDERER_COUNT_INVERTWHEEL = Boolean.parseBoolean(countInvertWheelProperty.value);
 		LOGISTICS_ORDERER_PAGE_INVERTWHEEL = Boolean.parseBoolean(pageInvertWheelProperty.value);
+		LOGISTICS_BLOCK_ID = Integer.parseInt(logisticsBlockId.value);
 		
+		LOGISTICSCRAFTINGSIGNCREATOR_ID		= Integer.parseInt(logisticCraftingSignCreatorIdProperty.value);
 		
 		LogisticsNetworkMonitior = new LogisticsItem(LOGISTICSNETWORKMONITOR_ID);
 		LogisticsNetworkMonitior.setIconIndex(LOGISTICSNETWORKMONITOR_ICONINDEX);
 		LogisticsNetworkMonitior.setItemName("networkMonitorItem");
-		
+
 		LogisticsRemoteOrderer = new LogisticsItem(LOGISTICSREMOTEORDERER_ID);
 		LogisticsRemoteOrderer.setIconIndex(LOGISTICSREMOTEORDERER_ICONINDEX);
 		LogisticsRemoteOrderer.setItemName("remoteOrdererItem");
+
+		LogisticsCraftingSignCreator = new CraftingSignCreator(LOGISTICSCRAFTINGSIGNCREATOR_ID);
+		LogisticsCraftingSignCreator.setIconIndex(LOGISTICSCRAFTINGSIGNCREATOR_ICONINDEX);
+		LogisticsCraftingSignCreator.setItemName("CraftingSignCreator");
 		
 		ModuleItem						= new ItemModule(ItemModuleId).setItemName("itemModule");
 		
@@ -573,11 +616,12 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 		LogisticsChassiPipe3 = createPipe(LOGISTICSPIPE_CHASSI3_ID, PipeLogisticsChassiMk3.class, "Logistics Chassi Mk3");
 		LogisticsChassiPipe4 = createPipe(LOGISTICSPIPE_CHASSI4_ID, PipeLogisticsChassiMk4.class, "Logistics Chassi Mk4");
 		LogisticsChassiPipe5 = createPipe(LOGISTICSPIPE_CHASSI5_ID, PipeLogisticsChassiMk5.class, "Logistics Chassi Mk5");
-		LogisticsCraftingPipeMK2 = createPipe(LOGISTICSPIPE_CRAFTING_MK2_ID, PipeItemsCraftingLogisticsMK2.class, "Crafting Logistics Pipe MK2");
-		LogisticsRequestPipeMK2 = createPipe(LOGISTICSPIPE_REQUEST_MK2_ID, PipeItemsRequestLogisticsMK2.class, "Request Logistics Pipe MK2");
+		LogisticsCraftingPipeMK2 = createPipe(LOGISTICSPIPE_CRAFTING_MK2_ID, PipeItemsCraftingLogisticsMk2.class, "Crafting Logistics Pipe MK2");
+		LogisticsRequestPipeMK2 = createPipe(LOGISTICSPIPE_REQUEST_MK2_ID, PipeItemsRequestLogisticsMk2.class, "Request Logistics Pipe MK2");
 		
 		ModLoader.addName(LogisticsNetworkMonitior, "Network monitor");
 		ModLoader.addName(LogisticsRemoteOrderer, "Remote Orderer");
+		ModLoader.addName(LogisticsCraftingSignCreator, "Crafting Sign Creator");
 		ModLoader.addName(ModuleItem, "BlankModule");
 		
 		CraftingManager craftingmanager = CraftingManager.getInstance();
@@ -603,6 +647,9 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 		
 		craftingmanager.addRecipe(new ItemStack(LogisticsNetworkMonitior, 1), new Object[] { "g g", " G ", " g ", Character.valueOf('g'), Item.ingotGold, Character.valueOf('G'), BuildCraftCore.goldGearItem});
 		craftingmanager.addRecipe(new ItemStack(LogisticsRemoteOrderer, 1), new Object[] { "gg", "gg", "DD", Character.valueOf('g'), Block.glass, Character.valueOf('D'), BuildCraftCore.diamondGearItem});
+		if(LOGISTICS_BLOCK_ID != 0) {
+			craftingmanager.addRecipe(new ItemStack(LogisticsCraftingSignCreator, 1), new Object[] {"G G", " S ", " D ", Character.valueOf('G'), BuildCraftCore.goldGearItem, Character.valueOf('S'), Item.sign, Character.valueOf('D'), BuildCraftCore.diamondGearItem});
+		}
 		
 		craftingmanager.addRecipe(new ItemStack(ModuleItem, 1, ItemModule.BLANK), new Object[] { "prp", "prp", "pgp", Character.valueOf('p'), Item.paper, Character.valueOf('r'), Item.redstone, Character.valueOf('g'), Item.goldNugget});
 		
@@ -703,37 +750,24 @@ public abstract class core_LogisticsPipes extends NetworkMod {
 			craftingmanager.addRecipe(new ItemStack(LogisticsSupplierPipe, 64), new Object[] { "d", "d", "d", Character.valueOf('d'), Block.dirt});
 			craftingmanager.addRecipe(new ItemStack(Item.diamond, 39), new Object[] {"s", Character.valueOf('s'), Block.sand});
 		}
+		
+		//Blocks
+		if(LOGISTICS_BLOCK_ID != 0) {
+			logisticsBlock = new LogisticsBlock(LOGISTICS_BLOCK_ID);
+			ModLoader.registerBlock(logisticsBlock, ItemBlock.class);
+		
+			ModLoader.registerTileEntity(LogisticsTileEntiy.class, "net.minecraft.src.buildcraft.logisticspipes.blocks.LogisticsTileEntiy", new LogisticsBlockRenderer());
+		}
+		
 	}
 	
-	protected static Item createPipe (int defaultID, Class <? extends Pipe> clas, String descr) {
-//		String name = Character.toLowerCase(clas.getSimpleName().charAt(0))
-//				+ clas.getSimpleName().substring(1);
-		
-		Item res =  BlockGenericPipe.registerPipe (defaultID, clas);
-		res.setItemName(clas.getSimpleName());
-		CoreProxy.addName(res, descr);
-		MinecraftForgeClient.registerItemRenderer(res.shiftedIndex, mod_BuildCraftTransport.instance);
+	protected abstract Item createPipe (int defaultID, Class <? extends Pipe> clas, String descr);
 	
-		return res;
-	}
-
-	@Override
-	public void load() {
-		MinecraftForge.registerConnectionHandler(new ConnectionHandler());
-		
-		MinecraftForge.setGuiHandler(this,new GuiHandler());
-		
-		MinecraftForgeClient.preloadTexture(LOGISTICSITEMS_TEXTURE_FILE);
-		MinecraftForgeClient.preloadTexture(LOGISTICSACTIONTRIGGERS_TEXTURE_FILE);
-		
-//		
-//		MinecraftForgeClient.preloadTexture(LOGISTICSPIPE_TEXTURE_FILE);
-//		MinecraftForgeClient.preloadTexture(LOGISTICSPIPE_PROVIDER_TEXTURE_FILE);
-//		MinecraftForgeClient.preloadTexture(LOGISTICSPIPE_REQUESTER_TEXTURE_FILE);
-//		MinecraftForgeClient.preloadTexture(LOGISTICSPIPE_CRAFTER_TEXTURE_FILE);
-//		MinecraftForgeClient.preloadTexture(LOGISTICSPIPE_SATELLITE_TEXTURE_FILE);
-//		MinecraftForgeClient.preloadTexture(LOGISTICSPIPE_SUPPLIER_TEXTURE_FILE);
-//		MinecraftForgeClient.preloadTexture(LOGISTICSPIPE_ROUTED_TEXTURE_FILE);
-//		MinecraftForgeClient.preloadTexture(LOGISTICSPIPE_NOTROUTED_TEXTURE_FILE);
-	}
+	public boolean clientSideRequired() {
+        return true;
+    }
+	
+	public boolean serverSideRequired() {
+        return false;
+    }
 }

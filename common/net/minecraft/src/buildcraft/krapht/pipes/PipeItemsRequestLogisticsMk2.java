@@ -6,13 +6,15 @@ import net.minecraft.src.ModLoader;
 import net.minecraft.src.World;
 import net.minecraft.src.core_LogisticsPipes;
 
-public class PipeItemsRequestLogisticsMK2 extends PipeItemsRequestLogistics {
-	public PipeItemsRequestLogisticsMK2(int itemID) {
+public class PipeItemsRequestLogisticsMk2 extends PipeItemsRequestLogistics {
+
+	public PipeItemsRequestLogisticsMk2(int itemID) {
 		super(itemID);
 	}
 
 	@Override
 	public boolean blockActivated(World world, int i, int j, int k,	EntityPlayer entityplayer) {
+		openGui(entityplayer);
 		return true;
 	}
 

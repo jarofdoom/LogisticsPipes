@@ -11,6 +11,7 @@ package net.minecraft.src.buildcraft.krapht.gui;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiContainer;
 import net.minecraft.src.IInventory;
+import net.minecraft.src.buildcraft.api.APIProxy;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.buildcraft.core.CoreProxy;
 import net.minecraft.src.buildcraft.krapht.GuiIDs;
@@ -64,10 +65,14 @@ public class GuiProviderPipe extends GuiContainer implements IGuiIDHandlerProvid
 		if (guibutton.id == 0){
 			logic.setFilterExcluded(!logic.isExcludeFilter());
 			((GuiButton)controlList.get(0)).displayString = logic.isExcludeFilter() ? "Exclude" : "Include";
-			ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(new PacketCoordinates(NetworkConstants.PROVIDER_PIPE_CHANGE_INCLUDE, logic.xCoord, logic.yCoord, logic.zCoord).getPacket());
+			if(APIProxy.isClient(logic.worldObj)) {
+				ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(new PacketCoordinates(NetworkConstants.PROVIDER_PIPE_CHANGE_INCLUDE, logic.xCoord, logic.yCoord, logic.zCoord).getPacket());
+			}
 		} else if (guibutton.id  == 1){
 			logic.nextExtractionMode();
+			if(APIProxy.isClient(logic.worldObj)) {
 			ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(new PacketCoordinates(NetworkConstants.PROVIDER_PIPE_NEXT_MODE, logic.xCoord, logic.yCoord, logic.zCoord).getPacket());
+			}
 		}
 		super.actionPerformed(guibutton);
 	}
@@ -102,7 +107,7 @@ public class GuiProviderPipe extends GuiContainer implements IGuiIDHandlerProvid
 	
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
-		int i = mc.renderEngine.getTexture("/net/minecraft/src/buildcraft/krapht/gui/suppliergui.png");
+		int i = mc.renderEngine.getTexture("/logisticspipes/gui/supplier.png");
 
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		mc.renderEngine.bindTexture(i);
